@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>ENCCEJA 2026 — Plano de Estudos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..900&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap">
+<style>
+  :root {
+    --bg: #080B14;
+    --bg2: #0C1120;
+    --ink: #ECF1FC;
+    --muted: #5872A0;
+    --muted2: #3D5680;
+    --muted3: #283C5E;
+    --card: #131A2E;
+    --card-border: #202C48;
+    --panel: #0F1424;
+    --panel-border: #1A2440;
+    --amber: #F2A93B;
+    --amber-dim: #F2A93B22;
+    --good: #34D399;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); }
+  body {
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+  }
+  a { text-decoration: none; color: inherit; }
+  button { font-family: inherit; }
+  .num { font-family: 'Space Grotesk', 'Inter', sans-serif; }
+  .display { font-family: 'Fraunces', serif; font-optical-sizing: auto; }
+
+  .app { max-width: 480px; margin: 0 auto; min-height: 100vh; }
+
+  .scroll-x { overflow-x: auto; scrollbar-width: none; }
+  .scroll-x::-webkit-scrollbar { display: none; }
+
+  @keyframes pulse { 0%,100% { opacity: .85; } 50% { opacity: 1; } }
+  @keyframes pop { 0% { transform: scale(.82); } 55% { transform: scale(1.12); } 100% { transform: scale(1); } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes toastIn { from { opacity:0; transform: translate(-50%, 8px); } to { opacity:1; transform: translate(-50%, 0); } }
+  @keyframes fillBubble { 0% { transform: scale(.7); } 50% { transform: scale(1.25); } 100% { transform: scale(1); } }
+  @keyframes drift { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(6px,-8px) rotate(3deg); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  .tag {
+    display: inline-block;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 5px;
+    letter-spacing: .5px;
+  }
+  .tag-verified { background: #11331f; color: #4ade80; border: 1px solid #18502c; }
+  .tag-search   { background: #2c2210; color: #F2A93B; border: 1px solid #43340f; font-weight: 700; }
+
+  .channel-card {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    background: var(--card);
+    border-radius: 14px;
+    padding: 13px 14px;
+    margin-bottom: 9px;
+    border: 1.5px solid var(--card-border);
+    transition: border-color .2s, background .2s, transform .15s;
+    cursor: pointer;
+  }
+  .channel-card:hover { background: #182246; transform: translateY(-1px); }
+  .channel-card:focus-visible, .day-tab:focus-visible, .mark-btn:focus-visible, .ntf-toggle:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 2px;
+  }
+
+  .day-tab {
+    flex-shrink: 0;
+    width: 60px;
+    padding: 10px 0 11px;
+    border-radius: 13px;
+    border: 2px solid var(--panel-border);
+    background: var(--panel);
+    cursor: pointer;
+    text-align: center;
+    transition: all .18s;
+  }
+  .day-tab .lbl { font-size: 9px; font-weight: 900; letter-spacing: 1.2px; color: var(--muted2); margin-bottom: 4px; }
+  .day-tab .emoji { font-size: 15px; }
+  .day-tab.selected { background: var(--accent-bg); border-color: var(--accent); }
+  .day-tab.selected .lbl { color: var(--accent); }
+  .day-tab.done .emoji { font-size: 18px; }
+
+  .mark-btn {
+    flex-shrink: 0;
+    margin-left: 10px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1.5px solid #28406A;
+    background: transparent;
+    color: #44608E;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .15s;
+  }
+  .mark-btn.done {
+    border-color: var(--good);
+    background: #34D39918;
+    color: var(--good);
+  }
+  .mark-btn:active { transform: scale(.96); }
+
+  .ntf-toggle {
+    width: 44px;
+    height: 26px;
+    border-radius: 14px;
+    border: none;
+    background: var(--panel-border);
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background .2s;
+  }
+  .ntf-toggle.on { background: var(--good); }
+  .ntf-toggle .knob {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    transition: left .2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.3);
+  }
+  .ntf-toggle.on .knob { left: 21px; }
+
+  /* answer-sheet bubble progress */
+  .bubble-row { display: flex; gap: 7px; align-items: center; }
+  .bubble {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--muted3);
+    flex-shrink: 0;
+    position: relative;
+    transition: border-color .2s;
+  }
+  .bubble.filled {
+    border-color: var(--good);
+    background: var(--good);
+    animation: fillBubble .35s ease;
+  }
+  .bubble.filled::after {
+    content: '';
+    position: absolute; inset: 5px;
+    border-radius: 50%;
+    background: #06251a;
+  }
+
+  .fade-in { animation: fadeIn .25s ease; }
+  .pop { animation: pop .35s ease; }
+  .toast { animation: toastIn .25s ease; }
+
+  .playlist-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--panel);
+    border-radius: 12px;
+    padding: 11px 13px;
+    margin-bottom: 8px;
+    border: 1.5px solid var(--panel-border);
+    transition: border-color .2s, background .2s, transform .15s;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+  }
+  .playlist-card:hover { background: #182246; border-color: #2E3D6E; transform: translateY(-1px); }
+  .playlist-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #CC000018;
+    border: 1px solid #CC000040;
+    border-radius: 6px;
+    padding: 2px 7px;
+    font-size: 9px;
+    font-weight: 800;
+    color: #FF6B6B;
+    letter-spacing: .4px;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<div id="root" class="app"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ── Esta página não inicia downloads, redirecionamentos ou abas automaticamente.
+  // Todo link abre apenas quando você clica nele, em uma nova aba (target="_blank"),
+  // e nenhum script aqui dispara arquivos para baixar por conta própria.
+
+  // ── Data ────────────────────────────────────────────────
+  var EXAM_DATE = new Date("2026-08-23T09:00:00-03:00");
+  var STORAGE_KEY = "encceja-planner-2026";
+  var NOTIF_KEY = "encceja-planner-notif-2026";
+
+  var schedule = [
+    {
+      day: "Segunda-feira", short: "SEG", area: "Matemática", emoji: "📐",
+      topics: "Operações • Álgebra • Geometria • Estatística",
+      accent: "#A78BFA", grad: "linear-gradient(135deg,#7C3AED 0%,#4338CA 100%)",
+      channels: [
+        { name: "Marcos Aba Matemática", sub: "3,6 mi inscritos • desde 2010", desc: "Matemática do zero, passo a passo", icon: "🔢", url: "https://www.youtube.com/c/MarcosAba", verified: true },
+        { name: "Professor Ferretto", sub: "3,4 mi inscritos • ENEM & ENCCEJA", desc: "Aulões intensivos de matemática", icon: "📊", url: "https://www.youtube.com/channel/UCW9_n8p_Byz-4k8wV1tnUBg", verified: true },
+        { name: "Matemática Rio", sub: "Prof. Rafael Procópio • desde 2010", desc: "Mais de 1.400 aulas, do básico ao avançado", icon: "📏", url: "https://www.youtube.com/results?search_query=matematica+rio+rafael+procopio+encceja", verified: false },
+        { name: "Me Salva!", sub: "Matemática, Física e Química", desc: "Resolução de exercícios e simulados", icon: "🧮", url: "https://www.youtube.com/results?search_query=me+salva+matematica+encceja+aula", verified: false },
+        { name: "OMatemático.com", sub: "Prof. Arthur Lima", desc: "Aulas por tópico com exemplos práticos", icon: "➗", url: "https://www.youtube.com/results?search_query=omatematico+arthur+lima+encceja", verified: false }
+      ],
+      playlists: [
+        { label: "Matemática Básica — ENCCEJA do zero", icon: "🔢", url: "https://www.youtube.com/results?search_query=playlist+matematica+basica+encceja+2026", desc: "Operações, frações e porcentagem" },
+        { label: "Álgebra e Equações", icon: "📐", url: "https://www.youtube.com/results?search_query=playlist+algebra+equacoes+encceja", desc: "Equações do 1º e 2º grau" },
+        { label: "Geometria Plana e Espacial", icon: "📏", url: "https://www.youtube.com/results?search_query=playlist+geometria+plana+espacial+encceja", desc: "Áreas, volumes e figuras geométricas" },
+        { label: "Estatística e Probabilidade", icon: "📊", url: "https://www.youtube.com/results?search_query=playlist+estatistica+probabilidade+encceja", desc: "Média, moda, mediana e gráficos" }
+      ]
+    },
+    {
+      day: "Terça-feira", short: "TER", area: "História & Filosofia", emoji: "🏛️",
+      topics: "Brasil Colonial • República • Guerras • Filosofia",
+      accent: "#FB7185", grad: "linear-gradient(135deg,#E11D48 0%,#9F1239 100%)",
+      channels: [
+        { name: "História com o Vesgo", sub: "Canal do Vesgo • História BR e Geral", desc: "História descomplicada e divertida", icon: "📜", url: "https://www.youtube.com/results?search_query=historia+com+o+vesgo+encceja+aula", verified: false },
+        { name: "Se Liga Nessa História", sub: "1 mi inscritos • Prof. Walter Solla (USP)", desc: "História, Sociologia e Filosofia em formato leve", icon: "📖", url: "https://www.youtube.com/results?search_query=se+liga+nessa+historia+encceja", verified: false },
+        { name: "História Online", sub: "Professores de cursinhos de SP", desc: "Filosofia, Sociologia e aulões de atualidades", icon: "🏺", url: "https://www.youtube.com/results?search_query=historia+online+filosofia+sociologia+encceja", verified: false },
+        { name: "Canal Castanhari", sub: "Felipe Castanhari • História e atualidades", desc: "Conteúdo de história explicado de forma fácil", icon: "🎬", url: "https://www.youtube.com/results?search_query=felipe+castanhari+historia+encceja", verified: false },
+        { name: "Eduardo Bueno — Brasil 500", sub: "600 mil inscritos", desc: "História do Brasil contada como narrativa", icon: "🗿", url: "https://www.youtube.com/results?search_query=eduardo+bueno+historia+do+brasil+encceja", verified: false }
+      ],
+      playlists: [
+        { label: "História do Brasil — Colonial ao Império", icon: "🏛️", url: "https://www.youtube.com/results?search_query=playlist+historia+brasil+colonial+imperio+encceja", desc: "Descobrimento, colonização e Império" },
+        { label: "Brasil República e Era Vargas", icon: "📜", url: "https://www.youtube.com/results?search_query=playlist+brasil+republica+vargas+encceja", desc: "Proclamação, Vargas e Ditadura Militar" },
+        { label: "Primeira e Segunda Guerra Mundial", icon: "⚔️", url: "https://www.youtube.com/results?search_query=playlist+primeira+segunda+guerra+mundial+encceja", desc: "Causas, desenvolvimento e consequências" },
+        { label: "Filosofia para ENCCEJA", icon: "🧠", url: "https://www.youtube.com/results?search_query=playlist+filosofia+encceja+2026", desc: "Pensadores, ética e política" }
+      ]
+    },
+    {
+      day: "Quarta-feira", short: "QUA", area: "Linguagens & Redação", emoji: "✍️",
+      topics: "Gramática • Interpretação • Redação dissertativa",
+      accent: "#34D399", grad: "linear-gradient(135deg,#059669 0%,#065F46 100%)",
+      channels: [
+        { name: "Português com Letícia", sub: "1,5 mi inscritos • Profa. Letícia Góes (USP)", desc: "Gramática e interpretação de texto", icon: "📝", url: "https://www.youtube.com/@portuguescomleticia", verified: true },
+        { name: "Curso Enem Gratuito", sub: "1 mi inscritos • Rede Enem • Redação", desc: "Redação e Linguagens para ENCCEJA 100% grátis", icon: "🎓", url: "https://www.youtube.com/@CursoEnemGratuito", verified: true },
+        { name: "Professor Noslen", sub: "Língua Portuguesa, Literatura e Redação", desc: "Um dos pioneiros do ensino de Português no YouTube", icon: "🖋️", url: "https://www.youtube.com/results?search_query=professor+noslen+redacao+encceja", verified: false },
+        { name: "Redação Online", sub: "Profs. Magali e Josi", desc: "Dicas práticas para estruturar sua redação", icon: "📃", url: "https://www.youtube.com/results?search_query=redacao+online+magali+josi+encceja", verified: false }
+      ],
+      playlists: [
+        { label: "Gramática do zero — Português ENCCEJA", icon: "📝", url: "https://www.youtube.com/results?search_query=playlist+gramatica+portugues+encceja+2026", desc: "Classes de palavras, concordância e crase" },
+        { label: "Interpretação de Texto", icon: "📖", url: "https://www.youtube.com/results?search_query=playlist+interpretacao+texto+encceja", desc: "Como ler e responder questões de texto" },
+        { label: "Redação Dissertativa Passo a Passo", icon: "✍️", url: "https://www.youtube.com/results?search_query=playlist+redacao+dissertativa+encceja+passo+a+passo", desc: "Introdução, desenvolvimento e conclusão" },
+        { label: "Literatura Brasileira — ENCCEJA", icon: "📚", url: "https://www.youtube.com/results?search_query=playlist+literatura+brasileira+encceja", desc: "Principais movimentos e autores" }
+      ]
+    },
+    {
+      day: "Quinta-feira", short: "QUI", area: "Geografia & Sociologia", emoji: "🌍",
+      topics: "Brasil • Globalização • Meio Ambiente • Sociologia",
+      accent: "#FBBF24", grad: "linear-gradient(135deg,#D97706 0%,#92400E 100%)",
+      channels: [
+        { name: "Geografia em Foco", sub: "Geografia completa para ENCCEJA", desc: "Brasil e mundo no formato da prova", icon: "🗺️", url: "https://www.youtube.com/results?search_query=geografia+em+foco+encceja+aula+2025", verified: false },
+        { name: "Curso Enem Gratuito — Humanas", sub: "1 mi inscritos • Rede Enem", desc: "Geografia e Sociologia para ENCCEJA grátis", icon: "🌐", url: "https://www.youtube.com/@CursoEnemGratuito", verified: true },
+        { name: "Aula Livre", sub: "Plataforma com professores de cursinho", desc: "Geografia e Sociologia bem organizadas por tema", icon: "🧭", url: "https://www.youtube.com/results?search_query=aula+livre+geografia+sociologia+encceja", verified: false },
+        { name: "Pedro Rennó", sub: "Professor de Filosofia e Sociologia", desc: "Conteúdo direto sobre Filosofia e Sociologia", icon: "🧠", url: "https://www.youtube.com/results?search_query=pedro+renno+filosofia+sociologia+encceja", verified: false }
+      ],
+      playlists: [
+        { label: "Geografia do Brasil — Regiões e Biomas", icon: "🗺️", url: "https://www.youtube.com/results?search_query=playlist+geografia+brasil+regioes+biomas+encceja", desc: "Norte, Nordeste, Centro-oeste, Sul e Sudeste" },
+        { label: "Globalização e Geopolítica", icon: "🌐", url: "https://www.youtube.com/results?search_query=playlist+globalizacao+geopolitica+encceja", desc: "Blocos econômicos, desigualdade e conflitos" },
+        { label: "Meio Ambiente e Sustentabilidade", icon: "🌿", url: "https://www.youtube.com/results?search_query=playlist+meio+ambiente+sustentabilidade+encceja", desc: "Aquecimento global, desmatamento e energias" },
+        { label: "Sociologia — Sociedade e Cultura", icon: "👥", url: "https://www.youtube.com/results?search_query=playlist+sociologia+encceja+2026", desc: "Trabalho, desigualdade e movimentos sociais" }
+      ]
+    },
+    {
+      day: "Sexta-feira", short: "SEX", area: "Ciências da Natureza", emoji: "🔬",
+      topics: "Física • Química • Biologia integradas",
+      accent: "#38BDF8", grad: "linear-gradient(135deg,#0284C7 0%,#075985 100%)",
+      channels: [
+        { name: "Quero Ficar Vesgo — Física", sub: "Física do cotidiano para ENCCEJA", desc: "Física sem complicações, direto ao ponto", icon: "⚡", url: "https://www.youtube.com/results?search_query=quero+ficar+vesgo+fisica+encceja+aula", verified: false },
+        { name: "Química com o Vesgo", sub: "Química fácil e direta", desc: "Química descomplicada para ENCCEJA", icon: "⚗️", url: "https://www.youtube.com/results?search_query=quimica+com+vesgo+encceja+aula", verified: false },
+        { name: "Aprova Total — Biologia", sub: "Ex-Biologia Total • Prof. Jubilut", desc: "Maior canal de Biologia do Brasil", icon: "🧬", url: "https://www.youtube.com/@AprovaTotal", verified: true },
+        { name: "Canal Física — Prof. Boaro", sub: "Mecânica, Elétrica e mais", desc: "Didática impecável, direto ao ponto da prova", icon: "🔭", url: "https://www.youtube.com/results?search_query=professor+boaro+fisica+encceja", verified: false },
+        { name: "Química Simples", sub: "Aulas organizadas por tema", desc: "Aprende e ri ao mesmo tempo", icon: "🧪", url: "https://www.youtube.com/results?search_query=quimica+simples+encceja+aula", verified: false },
+        { name: "Nerdologia", sub: "Átila Iamarino & Filipe Figueiredo", desc: "Ciência explicada com profundidade e clareza", icon: "🔬", url: "https://www.youtube.com/results?search_query=nerdologia+biologia+ciencias+encceja", verified: false }
+      ],
+      playlists: [
+        { label: "Física para ENCCEJA — Do zero", icon: "⚡", url: "https://www.youtube.com/results?search_query=playlist+fisica+encceja+2026+basico", desc: "Cinemática, dinâmica, eletricidade e ondas" },
+        { label: "Química Fundamental — ENCCEJA", icon: "⚗️", url: "https://www.youtube.com/results?search_query=playlist+quimica+encceja+2026+fundamental", desc: "Tabela periódica, ligações e reações" },
+        { label: "Biologia — Células e Corpo Humano", icon: "🧬", url: "https://www.youtube.com/results?search_query=playlist+biologia+celulas+corpo+humano+encceja", desc: "Citologia, genética e fisiologia" },
+        { label: "Ecologia e Meio Ambiente", icon: "🌱", url: "https://www.youtube.com/results?search_query=playlist+ecologia+meio+ambiente+encceja", desc: "Cadeias alimentares, ecossistemas e impactos" }
+      ]
+    },
+    {
+      day: "Sábado", short: "SÁB", area: "Revisão & Simulado", emoji: "🏆",
+      topics: "Provas anteriores • Correção de erros • Redação",
+      accent: "#FB923C", grad: "linear-gradient(135deg,#EA580C 0%,#9A3412 100%)",
+      channels: [
+        { name: "Curso Enem Gratuito — Simulados", sub: "Rede Enem • Simulados ENCCEJA", desc: "Resolução comentada de provas anteriores", icon: "📋", url: "https://www.youtube.com/@CursoEnemGratuito", verified: true },
+        { name: "INEP — Provas Oficiais", sub: "Governo Federal • ENCCEJA oficial", desc: "Baixe as provas reais anteriores de graça", icon: "📄", url: "https://www.gov.br/inep/pt-br/areas-de-atuacao/avaliacao-e-exames-educacionais/encceja/provas-e-gabaritos", verified: true }
+      ],
+      playlists: [
+        { label: "Simulado ENCCEJA Completo — Todas as Áreas", icon: "📋", url: "https://www.youtube.com/results?search_query=playlist+simulado+encceja+2026+completo+resolucao", desc: "Resolução comentada de questões reais" },
+        { label: "Correção de Provas ENCCEJA Anteriores", icon: "✅", url: "https://www.youtube.com/results?search_query=playlist+correcao+prova+encceja+anterior+gabarito", desc: "Gabarito comentado das provas oficiais" },
+        { label: "Redação ENCCEJA — Exemplos nota máxima", icon: "✍️", url: "https://www.youtube.com/results?search_query=playlist+redacao+encceja+nota+maxima+exemplo", desc: "Redações corrigidas e comentadas" }
+      ]
+    }
+  ];
+
+  var areas = [
+    { label: "Matemática", color: "#A78BFA", day: "Seg" },
+    { label: "Ciências Humanas", color: "#FB7185", day: "Ter+Qui" },
+    { label: "Linguagens", color: "#34D399", day: "Qua" },
+    { label: "Ciências Natureza", color: "#38BDF8", day: "Sex" }
+  ];
+
+  // ── Persisted state ─────────────────────────────────────
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return { done: [], weekKey: currentWeekKey() };
+      var parsed = JSON.parse(raw);
+      if (parsed.weekKey !== currentWeekKey()) {
+        return { done: [], weekKey: currentWeekKey() };
+      }
+      return { done: parsed.done || [], weekKey: parsed.weekKey };
+    } catch (e) {
+      return { done: [], weekKey: currentWeekKey() };
+    }
+  }
+
+  function saveState(state) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
+  }
+
+  function loadNotifPrefs() {
+    try {
+      var raw = localStorage.getItem(NOTIF_KEY);
+      if (!raw) return { dailyReminder: false, hour: 19, minute: 0, doneAlert: true };
+      return JSON.parse(raw);
+    } catch (e) {
+      return { dailyReminder: false, hour: 19, minute: 0, doneAlert: true };
+    }
+  }
+
+  function saveNotifPrefs(p) {
+    try { localStorage.setItem(NOTIF_KEY, JSON.stringify(p)); } catch (e) { /* ignore */ }
+  }
+
+  function currentWeekKey() {
+    var d = new Date();
+    var onejan = new Date(d.getFullYear(), 0, 1);
+    var week = Math.ceil((((d - onejan) / 864e5) + onejan.getDay() + 1) / 7);
+    return d.getFullYear() + "-W" + week;
+  }
+
+  function defaultTabForToday() {
+    var d = new Date().getDay();
+    var map = { 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 0: 5 };
+    return map[d] != null ? map[d] : 0;
+  }
+
+  var state = {
+    tab: defaultTabForToday(),
+    done: loadState().done,
+    weekKey: loadState().weekKey,
+    notifOpen: false,
+    toast: null
+  };
+
+  var notif = loadNotifPrefs();
+  var dailyTimerId = null;
+
+  function daysLeft() {
+    return Math.max(0, Math.ceil((EXAM_DATE - Date.now()) / 864e5));
+  }
+
+  function urgencyColor(n) {
+    return n > 42 ? "#34D399" : n > 21 ? "#FBBF24" : "#FB7185";
+  }
+
+  // ── Notifications ───────────────────────────────────────
+  function notifSupported() {
+    return typeof window !== "undefined" && "Notification" in window;
+  }
+
+  function showToast(msg) {
+    state.toast = msg;
+    render();
+    setTimeout(function () { state.toast = null; renderToastOnly(); }, 2600);
+  }
+
+  function fireNotification(title, body) {
+    if (!notifSupported()) return;
+    if (Notification.permission !== "granted") return;
+    try {
+      var n = new Notification(title, {
+        body: body,
+        icon: undefined,
+        tag: "encceja-planner"
+      });
+      setTimeout(function () { try { n.close(); } catch (e) {} }, 8000);
+    } catch (e) { /* some browsers restrict this; ignore quietly */ }
+  }
+
+  function scheduleDailyReminder() {
+    if (dailyTimerId) { clearTimeout(dailyTimerId); dailyTimerId = null; }
+    if (!notif.dailyReminder) return;
+    if (!notifSupported() || Notification.permission !== "granted") return;
+
+    var now = new Date();
+    var target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), notif.hour, notif.minute, 0, 0);
+    if (target <= now) target.setDate(target.getDate() + 1);
+    var delay = target - now;
+
+    dailyTimerId = setTimeout(function () {
+      var day = schedule[defaultTabForToday()];
+      fireNotification("Hora de estudar para o ENCCEJA 📚", "Hoje é dia de " + day.area + ". Vamos lá!");
+      scheduleDailyReminder();
+    }, delay);
+  }
+
+  function requestNotifPermission(afterGrantCallback) {
+    if (!notifSupported()) {
+      showToast("Seu navegador não tem suporte a notificações.");
+      return;
+    }
+    if (Notification.permission === "granted") {
+      if (afterGrantCallback) afterGrantCallback();
+      return;
+    }
+    if (Notification.permission === "denied") {
+      showToast("Notificações bloqueadas. Libere nas configurações do navegador.");
+      return;
+    }
+    Notification.requestPermission().then(function (perm) {
+      if (perm === "granted") {
+        if (afterGrantCallback) afterGrantCallback();
+      } else {
+        showToast("Permissão de notificação não concedida.");
+      }
+      render();
+    });
+  }
+
+  function toggleDailyReminder() {
+    if (!notif.dailyReminder) {
+      requestNotifPermission(function () {
+        notif.dailyReminder = true;
+        saveNotifPrefs(notif);
+        scheduleDailyReminder();
+        showToast("Lembrete diário ativado ✓");
+        render();
+      });
+    } else {
+      notif.dailyReminder = false;
+      saveNotifPrefs(notif);
+      scheduleDailyReminder();
+      render();
+    }
+  }
+
+  function toggleDoneAlert() {
+    notif.doneAlert = !notif.doneAlert;
+    saveNotifPrefs(notif);
+    render();
+  }
+
+  function setReminderTime(h, m) {
+    notif.hour = h;
+    notif.minute = m;
+    saveNotifPrefs(notif);
+    scheduleDailyReminder();
+    render();
+  }
+
+  function toggleDone(i) {
+    var idx = state.done.indexOf(i);
+    var wasDone = idx >= 0;
+    if (wasDone) state.done.splice(idx, 1);
+    else state.done.push(i);
+    saveState({ done: state.done, weekKey: state.weekKey });
+
+    if (!wasDone && notif.doneAlert && notifSupported() && Notification.permission === "granted") {
+      fireNotification("Dia concluído! ✅", schedule[i].area + " marcado como feito. Continue assim!");
+    }
+    render();
+  }
+
+  function setTab(i) {
+    state.tab = i;
+    render();
+  }
+
+  // ── Render helpers ──────────────────────────────────────
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function renderBubbles() {
+    return schedule.map(function (d, i) {
+      var filled = state.done.indexOf(i) !== -1;
+      return '<div class="bubble' + (filled ? " filled" : "") + '" title="' + escapeHtml(d.short) + '"></div>';
+    }).join("");
+  }
+
+  function renderTabs() {
+    return schedule.map(function (d, i) {
+      var sel = state.tab === i;
+      var isDone = state.done.indexOf(i) !== -1;
+      return (
+        '<button class="day-tab' + (sel ? " selected" : "") + (isDone ? " done" : "") + '" ' +
+        'style="--accent:' + d.accent + ';--accent-bg:' + d.accent + '1a" ' +
+        'data-tab="' + i + '" aria-pressed="' + sel + '" aria-label="' + escapeHtml(d.day + ", " + d.area) + '">' +
+          '<div class="lbl">' + d.short + '</div>' +
+          '<div class="emoji">' + (isDone ? "✅" : d.emoji) + '</div>' +
+        '</button>'
+      );
+    }).join("") +
+    '<div style="flex-shrink:0;width:60px;padding:10px 0 11px;border-radius:13px;border:2px dashed var(--panel-border);text-align:center;opacity:.4">' +
+      '<div style="font-size:9px;font-weight:800;color:var(--muted3);letter-spacing:1.2px;margin-bottom:4px">DOM</div>' +
+      '<div style="font-size:15px">☀️</div>' +
+    '</div>';
+  }
+
+  function renderChannelCard(ch, day) {
+    return (
+      '<a href="' + ch.url + '" target="_blank" rel="noopener noreferrer" class="channel-card">' +
+        '<div style="width:50px;height:50px;border-radius:13px;flex-shrink:0;background:' + day.accent + '1c;border:1.5px solid ' + day.accent + '35;display:flex;align-items:center;justify-content:center;font-size:22px">' + ch.icon + '</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap;row-gap:3px">' +
+            '<div style="font-size:13px;font-weight:800;color:#E2EAFB;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px">' + escapeHtml(ch.name) + '</div>' +
+            '<span class="tag ' + (ch.verified ? "tag-verified" : "tag-search") + '">' + (ch.verified ? "✓ direto" : "🔍 busca") + '</span>' +
+          '</div>' +
+          '<div style="font-size:10px;font-weight:600;color:' + day.accent + ';margin-bottom:2px">' + escapeHtml(ch.sub) + '</div>' +
+          '<div style="font-size:11px;color:var(--muted2)">' + escapeHtml(ch.desc) + '</div>' +
+        '</div>' +
+        '<div style="flex-shrink:0;background:#CC0000;border-radius:9px;padding:8px 11px;display:flex;align-items:center;gap:4px;font-size:12px;font-weight:900;color:#FFF">▶</div>' +
+      '</a>'
+    );
+  }
+
+  function renderPlaylistCard(pl, day) {
+    return (
+      '<a href="' + pl.url + '" target="_blank" rel="noopener noreferrer" class="playlist-card">' +
+        '<div style="width:44px;height:44px;border-radius:11px;flex-shrink:0;background:#CC000020;border:1.5px solid #CC000035;display:flex;align-items:center;justify-content:center;font-size:20px">' + pl.icon + '</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap;row-gap:2px">' +
+            '<div style="font-size:12px;font-weight:800;color:#E2EAFB;line-height:1.3">' + escapeHtml(pl.label) + '</div>' +
+            '<span class="playlist-badge">▶ PLAYLIST</span>' +
+          '</div>' +
+          '<div style="font-size:10px;color:var(--muted2)">' + escapeHtml(pl.desc) + '</div>' +
+        '</div>' +
+        '<div style="flex-shrink:0;background:#CC0000;border-radius:8px;padding:7px 10px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#FFF;font-weight:900">▶</div>' +
+      '</a>'
+    );
+  }
+
+  function renderNotifPanel() {
+    var permState = notifSupported() ? Notification.permission : "unsupported";
+    var permLabel = permState === "granted" ? "Permitido" : permState === "denied" ? "Bloqueado pelo navegador" : permState === "unsupported" ? "Sem suporte" : "Ainda não pedido";
+    var permColor = permState === "granted" ? "#34D399" : permState === "denied" ? "#FB7185" : "#FBBF24";
+
+    var hourOptions = "";
+    [["18:00", 18, 0], ["19:00", 19, 0], ["20:00", 20, 0], ["21:00", 21, 0]].forEach(function (opt) {
+      var sel = (notif.hour === opt[1] && notif.minute === opt[2]);
+      hourOptions +=
+        '<button class="ntf-time" data-h="' + opt[1] + '" data-m="' + opt[2] + '" style="' +
+        'padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid ' + (sel ? "#34D399" : "var(--panel-border)") + ';' +
+        'background:' + (sel ? "#34D39918" : "var(--panel)") + ';color:' + (sel ? "#34D399" : "var(--muted)") + '">' + opt[0] + '</button>';
+    });
+
+    return (
+      '<div id="notif-panel" style="margin:0 20px 14px;background:var(--card);border:1.5px solid var(--card-border);border-radius:16px;padding:16px;animation:slideDown .2s ease">' +
+
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">' +
+          '<div style="font-size:13px;font-weight:800;color:#E2EAFB">🔔 Notificações</div>' +
+          '<div class="tag" style="background:transparent;border:1px solid ' + permColor + '50;color:' + permColor + '">' + permLabel + '</div>' +
+        '</div>' +
+        '<div style="font-size:10.5px;color:var(--muted2);margin-bottom:14px;line-height:1.5">Avisos enviados pelo seu navegador. Nada aqui baixa arquivos ou abre páginas sozinho — você decide tudo.</div>' +
+
+        '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--panel-border)">' +
+          '<div style="flex:1;padding-right:10px">' +
+            '<div style="font-size:12px;font-weight:700;color:#E2EAFB">Lembrete diário de estudo</div>' +
+            '<div style="font-size:10px;color:var(--muted2);margin-top:2px">Um aviso por dia no horário escolhido</div>' +
+          '</div>' +
+          '<button class="ntf-toggle' + (notif.dailyReminder ? " on" : "") + '" id="toggle-daily" aria-pressed="' + notif.dailyReminder + '" aria-label="Lembrete diário"><span class="knob"></span></button>' +
+        '</div>' +
+
+        (notif.dailyReminder ?
+          '<div style="display:flex;gap:6px;flex-wrap:wrap;padding:4px 0 10px">' + hourOptions + '</div>'
+        : "") +
+
+        '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--panel-border)">' +
+          '<div style="flex:1;padding-right:10px">' +
+            '<div style="font-size:12px;font-weight:700;color:#E2EAFB">Aviso ao concluir um dia</div>' +
+            '<div style="font-size:10px;color:var(--muted2);margin-top:2px">Notifica quando você marca ✓ Feito</div>' +
+          '</div>' +
+          '<button class="ntf-toggle' + (notif.doneAlert ? " on" : "") + '" id="toggle-done-alert" aria-pressed="' + notif.doneAlert + '" aria-label="Aviso ao concluir"><span class="knob"></span></button>' +
+        '</div>' +
+
+      '</div>'
+    );
+  }
+
+  function renderToast() {
+    if (!state.toast) return "";
+    return '<div class="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1A2348;border:1.5px solid #2E3D6E;color:#E2EAFB;font-size:12px;font-weight:700;padding:10px 18px;border-radius:24px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:50;white-space:nowrap">' + escapeHtml(state.toast) + '</div>';
+  }
+
+  function renderToastOnly() {
+    var el = document.getElementById("toast-slot");
+    if (el) el.innerHTML = renderToast();
+  }
+
+  function render() {
+    var day = schedule[state.tab];
+    var dLeft = daysLeft();
+    var urgency = urgencyColor(dLeft);
+
+    var html = '';
+
+    // HERO
+    html +=
+      '<div style="background:radial-gradient(circle at 20% -10%,#7C3AED22,transparent 50%),radial-gradient(circle at 90% 0%,#0284C722,transparent 45%),linear-gradient(170deg,#05070D 0%,#0A0E1A 100%);padding:26px 20px 20px;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--panel-border)">' +
+
+        '<div style="position:absolute;top:14px;left:18px;font-size:9px;font-weight:800;letter-spacing:3px;color:var(--muted);text-transform:uppercase">Preparação gratuita</div>' +
+
+        '<button id="notif-bell" aria-label="Configurar notificações" style="position:absolute;top:16px;right:16px;background:var(--panel);border:1.5px solid var(--panel-border);width:34px;height:34px;border-radius:10px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center">' +
+          (notif.dailyReminder ? "🔔" : "🔕") +
+        '</button>' +
+
+        '<div class="display" style="margin-top:20px;font-size:40px;font-weight:700;letter-spacing:-1px;line-height:1;color:#FFF">ENCCEJA</div>' +
+        '<div class="display" style="font-size:40px;font-weight:700;letter-spacing:-1px;line-height:1.05;color:' + urgency + ';text-shadow:0 0 28px ' + urgency + '55">2026</div>' +
+        '<div style="font-size:12px;color:var(--muted);margin-top:8px;letter-spacing:.3px">Prova oficial · 23 de agosto de 2026</div>' +
+
+        '<div style="display:inline-flex;align-items:center;gap:14px;margin-top:18px;padding:13px 22px;border-radius:16px;background:var(--panel);border:1.5px solid ' + urgency + '35">' +
+          '<div><div class="num" style="font-size:30px;font-weight:700;line-height:1;color:' + urgency + '">' + dLeft + '</div>' +
+          '<div style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:2px;margin-top:2px">DIAS</div></div>' +
+          '<div style="width:1px;height:36px;background:var(--card-border)"></div>' +
+          '<div style="text-align:left"><div style="font-size:13px;font-weight:700;color:#AFC4EC">até a prova</div>' +
+          '<div style="font-size:10px;color:var(--muted);margin-top:3px">Você vai conseguir 💪</div></div>' +
+        '</div>' +
+      '</div>';
+
+    // NOTIF PANEL
+    if (state.notifOpen) html += renderNotifPanel();
+
+    // ANSWER-SHEET PROGRESS
+    html +=
+      '<div style="padding:16px 20px 0">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">' +
+          '<span style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase">Seu cartão-resposta da semana</span>' +
+          '<span style="font-size:12px;font-weight:800;color:var(--good)">' + state.done.length + '/' + schedule.length + '</span>' +
+        '</div>' +
+        '<div class="bubble-row">' + renderBubbles() + '</div>' +
+      '</div>';
+
+    // TABS
+    html += '<div class="scroll-x" style="display:flex;gap:7px;padding:16px 20px 0">' + renderTabs() + '</div>';
+
+    // CONTENT
+    html += '<div style="padding:14px 20px 40px" class="fade-in" id="day-content">';
+
+    html +=
+      '<div style="background:' + day.grad + ';border-radius:18px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 12px 32px -10px ' + day.accent + '40">' +
+        '<div style="position:absolute;bottom:-22px;right:-8px;font-size:104px;opacity:.16;pointer-events:none;line-height:1">' + day.emoji + '</div>' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start">' +
+          '<div style="flex:1">' +
+            '<div style="font-size:10px;font-weight:900;color:#FFFFFFCC;letter-spacing:2px;margin-bottom:7px;text-transform:uppercase">' + day.day + '</div>' +
+            '<div class="display" style="font-size:23px;font-weight:600;color:#FFF;line-height:1.2;margin-bottom:6px">' + day.area + '</div>' +
+            '<div style="font-size:11px;color:#FFFFFFB0;font-weight:500;line-height:1.5">' + day.topics + '</div>' +
+          '</div>' +
+          '<button class="mark-btn' + (state.done.indexOf(state.tab) !== -1 ? " done" : "") + '" id="mark-btn" aria-pressed="' + (state.done.indexOf(state.tab) !== -1) + '" style="' + (state.done.indexOf(state.tab) !== -1 ? '' : 'background:#FFFFFF18;border-color:#FFFFFF40;color:#FFF') + '">' +
+            (state.done.indexOf(state.tab) !== -1 ? "✓ Feito!" : "Marcar ✓") +
+          '</button>' +
+        '</div>' +
+      '</div>';
+
+    html +=
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">' +
+        '<div style="font-size:10px;font-weight:800;color:var(--muted2);letter-spacing:2px;text-transform:uppercase">📺 Canais do YouTube</div>' +
+        '<div style="flex:1;height:1px;background:var(--panel-border)"></div>' +
+      '</div>';
+
+    html += day.channels.map(function (ch) { return renderChannelCard(ch, day); }).join("");
+
+    html +=
+      '<div style="display:flex;gap:10px;margin-bottom:16px;padding:10px 12px;background:var(--panel);border-radius:10px;border:1px solid var(--panel-border);flex-wrap:wrap">' +
+        '<div style="display:flex;align-items:center;gap:5px"><span class="tag tag-verified">✓ direto</span><span style="font-size:10px;color:var(--muted2)">= abre canal</span></div>' +
+        '<div style="display:flex;align-items:center;gap:5px"><span class="tag tag-search">🔍 busca</span><span style="font-size:10px;color:var(--muted2)">= pesquisa YouTube</span></div>' +
+      '</div>';
+
+    // PLAYLISTS SECTION
+    if (day.playlists && day.playlists.length) {
+      html +=
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">' +
+          '<div style="font-size:10px;font-weight:800;color:var(--muted2);letter-spacing:2px;text-transform:uppercase">🎵 Playlists para começar já</div>' +
+          '<div style="flex:1;height:1px;background:var(--panel-border)"></div>' +
+        '</div>' +
+        '<div style="background:#0D0F1C;border-radius:12px;padding:10px 10px 2px;border:1.5px solid #CC000025;margin-bottom:16px">' +
+          '<div style="font-size:10px;color:#FF6B6B;font-weight:700;margin-bottom:8px;padding:0 2px">📌 Clique na playlist e comece a estudar sem perder tempo!</div>' +
+          day.playlists.map(function(pl) { return renderPlaylistCard(pl, day); }).join("") +
+        '</div>';
+    }
+
+    html +=
+      '<div style="margin-bottom:14px">' +
+        '<div style="font-size:10px;font-weight:800;color:var(--muted2);letter-spacing:2px;margin-bottom:10px;text-transform:uppercase">🎯 4 Áreas da Prova</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+          areas.map(function (a) {
+            return '<div style="background:var(--panel);border-radius:12px;padding:12px 13px;border:1.5px solid ' + a.color + '35">' +
+              '<div style="font-size:11px;font-weight:800;color:' + a.color + ';margin-bottom:3px">' + a.label + '</div>' +
+              '<div style="font-size:10px;color:var(--muted2)">Dia: ' + a.day + '</div>' +
+              '<div style="font-size:9px;color:var(--muted3);margin-top:3px">Mín. 100 pts</div>' +
+            '</div>';
+          }).join("") +
+        '</div>' +
+      '</div>';
+
+    html +=
+      '<div style="background:#0E1F18;border-radius:12px;padding:13px 15px;border:1px solid #34D39930;margin-bottom:14px">' +
+        '<div style="font-size:10px;font-weight:800;color:var(--good);letter-spacing:1.5px;margin-bottom:5px;text-transform:uppercase">💡 Dica</div>' +
+        '<div style="font-size:12px;color:#6FA98C;line-height:1.6">Redação: mínimo <strong style="color:#E2EAFB">5,0</strong> na escala de 0–10. Escreva <strong style="color:#E2EAFB">uma redação por semana</strong> e peça correção a amigos ou grupos online.</div>' +
+      '</div>';
+
+    html +=
+      '<div style="padding:14px;background:var(--panel);border-radius:12px;text-align:center;border:1px dashed var(--panel-border)">' +
+        '<div style="font-size:22px;margin-bottom:5px">☀️</div>' +
+        '<div style="font-size:13px;font-weight:700;color:var(--muted2)">Domingo: descanso total!</div>' +
+        '<div style="font-size:11px;color:var(--muted3);margin-top:3px">O cérebro consolida o aprendizado dormindo bem</div>' +
+      '</div>';
+
+    html +=
+      '<div style="text-align:center;margin-top:20px;padding-bottom:10px">' +
+        '<div style="font-size:11px;color:var(--muted3);font-weight:600">' + dLeft + ' dias restantes • ' + schedule.length + ' dias de estudo por semana</div>' +
+      '</div>';
+
+    html += '</div>'; // day-content
+
+    html += '<div id="toast-slot">' + renderToast() + '</div>';
+
+    document.getElementById("root").innerHTML = html;
+    attachEvents();
+  }
+
+  function attachEvents() {
+    var tabs = document.querySelectorAll(".day-tab");
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].addEventListener("click", function () {
+        setTab(parseInt(this.getAttribute("data-tab"), 10));
+      });
+    }
+    var markBtn = document.getElementById("mark-btn");
+    if (markBtn) {
+      markBtn.addEventListener("click", function () {
+        toggleDone(state.tab);
+        var btn = document.getElementById("mark-btn");
+        if (btn) btn.classList.add("pop");
+      });
+    }
+    var bell = document.getElementById("notif-bell");
+    if (bell) {
+      bell.addEventListener("click", function () {
+        state.notifOpen = !state.notifOpen;
+        render();
+      });
+    }
+    var toggleDaily = document.getElementById("toggle-daily");
+    if (toggleDaily) {
+      toggleDaily.addEventListener("click", toggleDailyReminder);
+    }
+    var toggleDoneAlertBtn = document.getElementById("toggle-done-alert");
+    if (toggleDoneAlertBtn) {
+      toggleDoneAlertBtn.addEventListener("click", toggleDoneAlert);
+    }
+    var timeButtons = document.querySelectorAll(".ntf-time");
+    for (var j = 0; j < timeButtons.length; j++) {
+      timeButtons[j].addEventListener("click", function () {
+        setReminderTime(parseInt(this.getAttribute("data-h"), 10), parseInt(this.getAttribute("data-m"), 10));
+      });
+    }
+  }
+
+  render();
+  scheduleDailyReminder();
+
+  setInterval(render, 60 * 1000 * 30);
+})();
+</script>
+</body>
+</html>
